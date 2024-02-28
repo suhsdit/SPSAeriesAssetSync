@@ -1,0 +1,66 @@
+trigger:
+  - master
+
+name: 'SPSAeriesAssetSync'
+
+variables:
+  major: 0
+  minor: 1
+  patch: $(Build.BuildID)
+  buildVer: $(major).$(minor).$(patch)
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: '$(System.DefaultWorkingDirectory)/build.ps1'
+    - task: NuGetCommand@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '$(System.DefaultWorkingDirectory)/SPSAeriesAssetSync/SPSAeriesAssetSync.nuspec'
+        versioningScheme: byEnvVar
+        versionEnvVar: buildVer
+        buildProperties: 'VERSIONHERE=$(buildVer)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'NuGetPackage'
+        publishLocation: 'Container'
+- stage: Test
+  jobs:
+  - job: Test
+    steps:
+    - task: Pester@10 ## If a new version is out, you may have to increment this
+      inputs:
+        scriptFolder: "$(System.DefaultWorkingDirectory)/Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1"
+        resultsFile: "$(System.DefaultWorkingDirectory)/Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML"
+        usePSCore: true
+        run32Bit: False
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: "NUnit"
+        testResultsFiles: "$(System.DefaultWorkingDirectory)/Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML"
+        failTaskOnFailedTests: true
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'NuGetPackage'
+          itemPattern: '**'
+          targetPath: '$(Pipeline.Workspace)'
+      - task: NuGetCommand@2
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
+          nuGetFeedType: 'internal'
+          vstsFeed: 'suhsd'
+          publishVstsFeed: 'suhsd'

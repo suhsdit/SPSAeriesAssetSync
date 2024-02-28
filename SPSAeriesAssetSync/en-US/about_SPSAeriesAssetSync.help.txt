@@ -1,0 +1,14 @@
+PSTOPIC
+    about_SPSAeriesAssetSync
+
+SHORT DESCRIPTION
+    SPSAeriesAssetSync is a Collection of functions that sync data from Aeries to Google or syncs data within Aeries.
+
+LONG DESCRIPTION
+    SPSAeriesAssetSync is a Collection of functions that sync data from Aeries to Google or syncs data within Aeries.
+
+    For more information run help against individual commands or check out the wiki at:
+    https://dev.azure.com/suhsd/SPSAeriesAssetSync/_wiki/wikis/SPSAeriesAssetSync.wiki
+
+DETAILED DESCRIPTION
+   SPSAeriesAssetSync is a Collection of functions that sync data from Aeries to Google or syncs data within Aeries.
