@@ -12,7 +12,7 @@
 RootModule = 'SPSAeriesAssetSync.psm1'
 
 # Version number of this module.
-ModuleVersion = '<ModuleVersion>'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -52,7 +52,7 @@ PowerShellVersion = '5.1'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @('PSGSuite', 
-                    'PSAeries')
+                    'SPSAeries')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -134,4 +134,5 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 

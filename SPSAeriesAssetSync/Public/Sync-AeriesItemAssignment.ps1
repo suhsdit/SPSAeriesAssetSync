@@ -22,7 +22,7 @@ Function Sync-AeriesItemAssignment {
                 [string]$config,
             [Parameter( Mandatory,
                 Position=1)]
-        [string]$csv
+                [string]$csv
         )
     
         Begin {
@@ -31,7 +31,7 @@ Function Sync-AeriesItemAssignment {
     
             #include $DistrictAssetConfig
             . $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync\$config\DistrictAssetConfig.ps1
-            Set-PSAeriesConfiguration -Name $DistrictAssetConfig.PSAeriesConfig
+            Set-SPSAeriesConfiguration -Name $DistrictAssetConfig.SPSAeriesConfig
             $SchoolConfigs = $DistrictAssetConfig.SchoolConfigs
 
             if (!(Test-Path $csv)) {
@@ -43,7 +43,7 @@ Function Sync-AeriesItemAssignment {
             Write-Verbose "csvData Count: $($csvData.Count)"
 
             $itemsHT = @{}
-            $aeriesItems = Get-AeriesDistrictAssetItem | Where-Object {(!([string]::IsNullOrEmpty($_.SerialNumber)))}
+            $aeriesItems = Get-SPSAeriesDistrictAssetItem | Where-Object {(!([string]::IsNullOrEmpty($_.SerialNumber)))}
             Write-Verbose "aeriesItems: $($aeriesItems.Count)"
 
             foreach ($item in $aeriesItems) {
@@ -71,7 +71,7 @@ Function Sync-AeriesItemAssignment {
 
                         Write-Verbose $AssignmentSplat
 
-                        New-AeriesDistrictAssetAssociation @AssignmentSplat
+                        New-SPSAeriesDistrictAssetAssociation @AssignmentSplat
                     }
                 }
 

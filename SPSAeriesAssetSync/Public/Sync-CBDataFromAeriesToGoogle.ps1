@@ -26,7 +26,7 @@ Function Sync-CBDataFromAeriesToGoogle {
         #include $DistrictAssetConfig
         . $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync\$config\DistrictAssetConfig.ps1
         Set-PSGSuiteConfig $DistrictAssetConfig.PSGSuiteConfig
-        Set-PSAeriesConfiguration -Name $DistrictAssetConfig.PSAeriesConfig
+        Set-SPSAeriesConfiguration -Name $DistrictAssetConfig.SPSAeriesConfig
         $SchoolConfigs = $DistrictAssetConfig.SchoolConfigs
     }
     Process {
@@ -54,7 +54,7 @@ Function Sync-CBDataFromAeriesToGoogle {
         Write-Verbose "Found unique models: $($Models)"
 
         # Get Updated list of District Asset Titles
-        $AeriesTitles = Get-AeriesDistrictAssetTitle | Where-Object {$Models -contains $_.Title}
+        $AeriesTitles = Get-SPSAeriesDistrictAssetTitle | Where-Object {$Models -contains $_.Title}
         $TitlesHT = @{}
         $ItemsHT = @{}
         $AeriesTitles | ForEach-Object {$TitlesHT[$_.Title] = $_}
@@ -62,7 +62,7 @@ Function Sync-CBDataFromAeriesToGoogle {
 
         # Hashtable for all Chromebook items in Aeries
         foreach ($title in $TitlesHT.GetEnumerator()) {
-            Get-AeriesDistrictAssetItem -AssetTitleNumber $title.Value.AssetTitleNumber | ForEach-Object {
+            Get-SPSAeriesDistrictAssetItem -AssetTitleNumber $title.Value.AssetTitleNumber | ForEach-Object {
                 $ItemsHT[$_.Barcode] = $_
             }
         }
@@ -74,12 +74,12 @@ Function Sync-CBDataFromAeriesToGoogle {
             $item = $item.Value
             if ($cbHT.ContainsKey($item.SerialNumber)) {
                 $cb = $cbHT[$item.SerialNumber]
-                $itemAssoc = Get-AeriesDistrictAssetAssociation -AssetTitleNumber $item.AssetTitleNumber -AssetItemNumber $item.AssetItemNumber |
+                $itemAssoc = Get-SPSAeriesDistrictAssetAssociation -AssetTitleNumber $item.AssetTitleNumber -AssetItemNumber $item.AssetItemNumber |
                     Select-Object -Last 1
                 if ($itemAssoc -And [string]::IsNullOrEmpty($itemAssoc.DateReturned)) {
                     # If Date returned is empty, the item is currently checked out to a user
 
-                    # We want to check this first because Get-AeriesDistrictAssetAssociation will return an assigned user whether
+                    # We want to check this first because Get-SPSAeriesDistrictAssetAssociation will return an assigned user whether
                     # the device is checked out or not and we don't want to populate Google with the last user to have the
                     # chromebook if they don't currently have it.
 
@@ -88,7 +88,7 @@ Function Sync-CBDataFromAeriesToGoogle {
                     if ($itemAssoc.UserType -like "S") {
                         $userEmail = "$($itemAssoc.UserID)@suhsd.net"
                     } elseif ($itemAssoc.UserType -like "T") {
-                        $userEmail = (Get-AeriesStaff -ID $itemAssoc.UserID).EmailAddress
+                        $userEmail = (Get-SPSAeriesStaffEmail -ID $itemAssoc.UserID).EmailAddress
                     }
 
                     Write-Verbose "Checking annotated user for CB $($cb.SerialNumber)"
