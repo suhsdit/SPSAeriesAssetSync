@@ -33,7 +33,7 @@ Copyright = '(c) jgeron. All rights reserved.'
 Description = 'PowerShell module to sync Google Chromebooks between Google Admin Console and Aeries SIS.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.1'
+PowerShellVersion = '7.4'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
