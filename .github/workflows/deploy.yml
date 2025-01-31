@@ -53,6 +53,7 @@ jobs:
       shell: pwsh
       run: |
         Install-Module -Name AeriesAPI -Force
+        Install-Module -Name SPSAeries -Force
         Install-Module -Name PSGSuite -Force
 
     
