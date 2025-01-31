@@ -80,5 +80,5 @@ jobs:
     - name: Push NuGet package
       shell: pwsh
       run: |
-        nuget sources add -name "ADO" -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -username "anything" -password ${{ secrets.AZURE_DEVOPS_TOKEN }}
-        nuget push ./**/*.nupkg -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -apikey ${{ secrets.AZURE_DEVOPS_TOKEN }}
+        mono nuget sources add -name "ADO" -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -username "anything" -password ${{ secrets.AZURE_DEVOPS_TOKEN }}
+        mono nuget push ./**/*.nupkg -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -apikey ${{ secrets.AZURE_DEVOPS_TOKEN }}
