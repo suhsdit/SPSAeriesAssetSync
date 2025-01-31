@@ -1,0 +1,89 @@
+name: SPSAeriesAssetSync
+
+on:
+  push:
+    branches: main
+
+env:
+  major: 0
+  minor: 2
+  patch: ${{ github.run_number }}
+  buildVer: 0.2.${{ github.run_number }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run build script
+      env:
+        buildVer: ${{ env.buildVer }}
+      run: pwsh -File ./build.ps1
+
+    - name: Install Mono
+      run: sudo apt-get install -y mono-complete
+
+    - name: Pack NuGet
+      env:
+        buildVer: ${{ env.buildVer }}
+      run: |
+        wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+        mono nuget.exe pack ./SPSAeriesAssetSync/SPSAeriesAssetSync.nuspec -Version ${{ env.buildVer }}
+        echo VERSIONHERE=${{ env.buildVer }} > ./SPSAeriesAssetSync/SPSAeriesAssetSync.nuspec
+
+    - name: Publish NuGet package
+      uses: actions/upload-artifact@v4
+      with:
+        name: NuGetPackage
+        path: ./**/*.nupkg
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run Pester tests
+      shell: pwsh
+      run: |
+        Install-Module -Name Pester -Force
+        Invoke-Pester -Script "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1" -OutputFile "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML" -OutputFormat NUnitXml -EnableExit $true
+
+    - name: Publish test results
+      uses: mikepenz/action-junit-report@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        report_paths: './Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML'
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Mono
+      run: sudo apt-get install -y mono-complete
+    
+    - name: Download NuGet executable
+      run: |
+        wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+        chmod +x nuget.exe
+
+    - name: Download NuGet package
+      uses: actions/download-artifact@v4
+      with:
+        name: NuGetPackage
+        path: .
+
+    - name: Push NuGet package
+      shell: pwsh
+      run: |
+        mono nuget.exe sources add -name "ADO" -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -username "anything" -password ${{ secrets.AZURE_DEVOPS_TOKEN }}
+        mono nuget.exe push ./**/*.nupkg -source "https://pkgs.dev.azure.com/suhsd/_packaging/suhsd/nuget/v3/index.json" -apikey ${{ secrets.AZURE_DEVOPS_TOKEN }}
