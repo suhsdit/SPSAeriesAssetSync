@@ -44,17 +44,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run build script
-      env:
-        buildVer: ${{ env.buildVer }}
-      run: pwsh -File ./build.ps1
-  
-    - name: Install dependencies
-      shell: pwsh
-      run: |
-        Install-Module -Name AeriesAPI -Force
-        Install-Module -Name SPSAeries -Force
-        Install-Module -Name PSGSuite -Force
+    - name: Download NuGet package
+      uses: actions/download-artifact@v4.1.7
+      with:
+        name: NuGetPackage
+        path: .
 
     
     - name: Publish Module to PSGallery
