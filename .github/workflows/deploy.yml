@@ -27,7 +27,7 @@ jobs:
       shell: pwsh
       run: |
         Install-Module -Name Pester -Force
-        Invoke-Pester -Script "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1" -OutputFile "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML" -OutputFormat NUnitXml -EnableExit $true
+        Invoke-Pester -Path "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1" -OutputFile "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML" -OutputFormat NUnitXml -EnableExit $true
 
     - name: Publish test results
       uses: actions/upload-artifact@v4
