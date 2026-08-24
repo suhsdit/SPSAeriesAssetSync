@@ -28,7 +28,7 @@ Function Sync-CBModelsFromGoogleToAeries {
         Write-Verbose "Using Config: $config"
         . $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync\$config\DistrictAssetConfig.ps1
         Set-PSGSuiteConfig $DistrictAssetConfig.PSGSuiteConfig
-        Set-PSAeriesConfiguration -Name $DistrictAssetConfig.PSAeriesConfig
+        Set-SPSAeriesConfiguration -Name $DistrictAssetConfig.SPSAeriesConfig
         $SchoolConfigs = $DistrictAssetConfig.SchoolConfigs
         Write-Verbose ($SchoolConfigs | Format-Table | Out-String)
     }
@@ -67,12 +67,12 @@ Function Sync-CBModelsFromGoogleToAeries {
 
         $Models = $cbHT.GetEnumerator() | ForEach-Object {$_.Value.Model} | Sort-Object | Get-Unique
         Write-Verbose "Found unique models: $($Models)"
-        $AeriesTitles = Get-AeriesDistrictAssetTitle
+        $AeriesTitles = Get-SPSAeriesDistrictAssetTitle
 
         ForEach ($model in $Models) {
             if ($AeriesTitles.Title -notcontains $model) {
                 Write-Verbose "Model missing from Aeries District Assets, creating title in Aeries: $($model)"
-                New-AeriesDistrictAssetTitle -Title $model
+                New-SPSAeriesDistrictAssetTitle -Title $model
             } else {
                 Write-Verbose "Model exists in Aeries District Assets Titles: $($model)"
             }

@@ -12,7 +12,7 @@
 RootModule = 'SPSAeriesAssetSync.psm1'
 
 # Version number of this module.
-ModuleVersion = '<ModuleVersion>'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -33,7 +33,7 @@ Copyright = '(c) jgeron. All rights reserved.'
 Description = 'PowerShell module to sync Google Chromebooks between Google Admin Console and Aeries SIS.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.1'
+PowerShellVersion = '7.4'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -52,7 +52,7 @@ PowerShellVersion = '5.1'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @('PSGSuite', 
-                    'PSAeries')
+                    'SPSAeries')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -134,4 +134,5 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
