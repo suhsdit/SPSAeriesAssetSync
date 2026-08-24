@@ -26,10 +26,18 @@ jobs:
     - name: Run Pester tests
       shell: pwsh
       run: |
-        Install-Module -Name Pester -Force
-        Invoke-Pester -Path "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1" -OutputFormat NUnitXml -OutputFile "./Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML" -EnableExit
+        Install-Module -Name Pester -RequiredVersion 6.1.0 -Force
+        Import-Module Pester -RequiredVersion 6.1.0
+        $config = New-PesterConfiguration
+        $config.Run.Path = './Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.ps1'
+        $config.Run.Exit = $true
+        $config.TestResult.Enabled = $true
+        $config.TestResult.OutputFormat = 'NUnitXml'
+        $config.TestResult.OutputPath = './Tests/1. Module Tests/SPSAeriesAssetSync.Module.Tests.XML'
+        Invoke-Pester -Configuration $config
 
     - name: Publish test results
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: test-results
