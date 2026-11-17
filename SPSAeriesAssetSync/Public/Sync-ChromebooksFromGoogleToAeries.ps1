@@ -38,6 +38,9 @@ Function Sync-ChromebooksFromGoogleToAeries {
         # We'll pull Active chromebooks from each 1:1 unassigned directory
         # and put into a hastable with the serial number as the key
         $cbHT = @{}
+        # Tally of long model names we had to truncate, keyed by the original name.
+        # Summarized once after the OU loops instead of logging every device.
+        $truncatedModelCounts = @{}
         foreach ($schoolConfig in $SchoolConfigs) {
             foreach ($GoogleOU in $schoolconfig.GoogleOUs) {
                 [string]$OUPath = $GoogleOU
@@ -52,19 +55,33 @@ Function Sync-ChromebooksFromGoogleToAeries {
                     # Truncated: Acer Chromebook Spin 511 (R753T R753TN R752T-R)
                     if ($_.Model.length -gt 60) {
                         $model = $_.Model
-                        Write-Verbose "Model name is over 60 characters: $model"
+                        $originalModel = $model
                         $modelNumbers = Get-TextWithin $model -WithinChar "("
                         $pos = $model.IndexOf("(")
                         $modelBeginning = $model.Substring(0, $pos)
                         $model = $modelBeginning + "($($modelNumbers))"
                         $cbHT[$_.serialnumber].Model = $model
-                        Write-Verbose "Model name truncated to: $model"
+                        if (-not $truncatedModelCounts.ContainsKey($originalModel)) {
+                            $truncatedModelCounts[$originalModel] = [PSCustomObject]@{
+                                Truncated = $model
+                                Count     = 0
+                            }
+                        }
+                        $truncatedModelCounts[$originalModel].Count++
                     }
                 }
                 Write-Verbose "Chromebooks Pulled from $($OUPath): $($cbHT.Count)"
             }
         }
         Write-Verbose "Total Chromebook count: $($cbHT.Count)"
+
+        if ($truncatedModelCounts.Count -gt 0) {
+            $truncatedTotal = ($truncatedModelCounts.Values | Measure-Object -Property Count -Sum).Sum
+            Write-Verbose "Truncated model names over 60 characters: $truncatedTotal device(s) across $($truncatedModelCounts.Count) model(s)"
+            foreach ($entry in ($truncatedModelCounts.GetEnumerator() | Sort-Object { $_.Value.Count } -Descending)) {
+                Write-Verbose "  $($entry.Value.Count) device(s): '$($entry.Key)' -> '$($entry.Value.Truncated)'"
+            }
+        }
 
         $Models = $cbHT.GetEnumerator() | ForEach-Object {$_.Value.Model} | Sort-Object | Get-Unique
         Write-Verbose "Found unique models: $($Models)"
