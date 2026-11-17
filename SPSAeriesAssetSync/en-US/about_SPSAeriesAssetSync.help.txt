@@ -12,3 +12,15 @@ LONG DESCRIPTION
 
 DETAILED DESCRIPTION
    SPSAeriesAssetSync is a Collection of functions that sync data from Aeries to Google or syncs data within Aeries.
+
+VERSIONING AND RELEASE NOTES
+    The module manifest owns the major and minor version; the build pipeline
+    supplies the patch from the CI run number, so released versions are of the
+    form <major>.<minor>.<run number>.
+
+    To see what changed in the version you have installed:
+
+        (Get-Module SPSAeriesAssetSync -ListAvailable).PrivateData.PSData.ReleaseNotes
+
+    The full changelog is kept in the README at:
+    https://github.com/suhsdit/SPSAeriesAssetSync#changelog

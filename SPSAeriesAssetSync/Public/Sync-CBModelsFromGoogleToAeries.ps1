@@ -6,7 +6,6 @@ Function Sync-CBModelsFromGoogleToAeries {
     The Sync-CBModelsFromGoogleToAeries function pulls adds new unique models to Aeries as Titles in Aeries District Assets
 .EXAMPLE
     Sync-CBModelsFromGoogleToAeries
-.PARAMETER
 .INPUTS
 .OUTPUTS
 .NOTES

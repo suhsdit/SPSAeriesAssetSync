@@ -9,7 +9,6 @@ Function Sync-AeriesItemAssignment {
         SerialNumber - Serial Number of device to match, if incomplete put * into csv as a wildcard match   
     .EXAMPLE
         Sync-AeriesItemAssignment
-    .PARAMETER
     .INPUTS
     .OUTPUTS
     .NOTES
