@@ -6,7 +6,6 @@ Function Sync-CBDataFromAeriesToGoogle {
     Updates Associated User and comment field from Aeries Items back into Google.
 .EXAMPLE
     Sync-CBDataFromAeriesToGoogle
-.PARAMETER
 .INPUTS
 .OUTPUTS
 .NOTES

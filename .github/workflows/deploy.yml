@@ -5,10 +5,10 @@ on:
     branches: [main, dev]
 
 env:
-  major: 0
-  minor: 2
+  # Major and minor are owned by SPSAeriesAssetSync.psd1 and bumped by hand.
+  # build.ps1 stamps this patch number in, so published versions always
+  # increase and never collide with what is already on PSGallery.
   patch: ${{ github.run_number }}
-  buildVer: 0.2.${{ github.run_number }}
 
 jobs:
   test:
@@ -20,7 +20,7 @@ jobs:
 
     - name: Run build script
       env:
-        buildVer: ${{ env.buildVer }}
+        patch: ${{ env.patch }}
       run: pwsh -File ./build.ps1
 
     - name: Run Pester tests
@@ -54,7 +54,7 @@ jobs:
 
     - name: Run build script
       env:
-        buildVer: ${{ env.buildVer }}
+        patch: ${{ env.patch }}
       run: pwsh -File ./build.ps1
 
     - name: Install dependencies

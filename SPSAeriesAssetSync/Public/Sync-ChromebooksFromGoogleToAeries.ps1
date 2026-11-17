@@ -8,11 +8,22 @@ Function Sync-ChromebooksFromGoogleToAeries {
     It will create new Titles in Aeries for new models detected in Google, and create new asset items in Aeries for new unique serial numbers found in the Google Admin Console.
 .EXAMPLE
     Sync-NewChromebooksFromGoogleToAeries
-.PARAMETER
 .INPUTS
 .OUTPUTS
 .NOTES
+    Model names returned by Google are sometimes longer than the 60 characters an
+    Aeries asset title allows, e.g.
+        "Acer Chromebook Spin 511 (R753T, R753TN, R752T, R752TN) Chromebook"
+    Those are shortened to the name plus the parenthesised model numbers:
+        "Acer Chromebook Spin 511 (R753T R753TN R752T-R)"
+
+    As of 0.3.0, -Verbose reports this once as a summary - each distinct model, the
+    name it was shortened to, and how many devices it covered - rather than two
+    lines per device. A district-wide sync previously emitted thousands of lines.
+
+    Changed in 0.3.0. See https://github.com/suhsdit/SPSAeriesAssetSync#changelog
 .LINK
+    https://github.com/suhsdit/SPSAeriesAssetSync
 #>
     [CmdletBinding()] #Enable all the default paramters, including -Verbose
     Param(

@@ -12,7 +12,7 @@
 RootModule = 'SPSAeriesAssetSync.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -106,13 +106,28 @@ PrivateData = @{
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/suhsdit/SPSAeriesAssetSync'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = @'
+0.3.0
+  - Sync-ChromebooksFromGoogleToAeries: model names over 60 characters are still
+    truncated the same way, but -Verbose now emits a single summary of what was
+    truncated and how many devices each affected, instead of two lines per device.
+  - Restored build-time versioning, which had been inert since 0.2.0. The manifest
+    owns major.minor; CI stamps the patch from the run number.
+  - Fixed comment-based help on all four Sync functions: a bare .PARAMETER keyword was
+    causing PowerShell to discard the whole help comment, so Get-Help returned nothing.
+
+0.2.0
+  - Published to PSGallery 2025-01-31. Refactored function calls for Aeries
+    integration.
+
+Full changelog: https://github.com/suhsdit/SPSAeriesAssetSync#changelog
+'@
 
         # Prerelease string of this module
         # Prerelease = ''
