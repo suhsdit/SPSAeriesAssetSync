@@ -12,7 +12,7 @@
 RootModule = 'SPSAeriesAssetSync.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.0'
+ModuleVersion = '0.4.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -113,6 +113,13 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = @'
+0.4.0
+  - Sync-ChromebooksFromGoogleToAeries and Sync-CBDataFromAeriesToGoogle: the verbose
+    lines reporting each item merely being examined now sit behind a -DetailedLogging
+    switch and are off by default, so -Verbose reports what changed rather than what
+    was inspected. Pass -DetailedLogging to restore them for item-level troubleshooting.
+  - Logging only: what is written to Aeries and Google is unchanged.
+
 0.3.0
   - Sync-ChromebooksFromGoogleToAeries: model names over 60 characters are still
     truncated the same way, but -Verbose now emits a single summary of what was

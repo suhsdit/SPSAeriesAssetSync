@@ -4,8 +4,20 @@ Function Sync-CBDataFromAeriesToGoogle {
     Import Chromebook data from Aeries to Google
 .DESCRIPTION
     Updates Associated User and comment field from Aeries Items back into Google.
+.PARAMETER config
+    Name of the DistrictAssetConfig to load from
+    $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync.
+.PARAMETER DetailedLogging
+    Emit one verbose line per item examined, not just per item changed. Off by
+    default, because a district-wide run with this on produces thousands of lines.
+    Has no effect without -Verbose.
 .EXAMPLE
     Sync-CBDataFromAeriesToGoogle
+.EXAMPLE
+    Sync-CBDataFromAeriesToGoogle -config District1 -Verbose -DetailedLogging
+
+    Reports every device examined, not just the ones that changed. Use when
+    tracking down a single asset.
 .INPUTS
 .OUTPUTS
 .NOTES
@@ -15,7 +27,11 @@ Function Sync-CBDataFromAeriesToGoogle {
     Param(
         [Parameter( Mandatory,
                     Position=0)]
-            [string]$config
+            [string]$config,
+        # Per-item examination lines are suppressed unless this is passed. They are
+        # one line per device and bury the change events in a district-wide run.
+        [Parameter()]
+            [switch]$DetailedLogging
     )
 
     Begin {
@@ -65,8 +81,10 @@ Function Sync-CBDataFromAeriesToGoogle {
                 $ItemsHT[$_.Barcode] = $_
             }
         }
-        Write-Verbose "Including items to check assigned users: "
-        Write-Verbose $ItemsHT
+        if ($DetailedLogging) {
+            Write-Verbose "Including items to check assigned users: "
+            Write-Verbose ($ItemsHT.Values | Format-Table | Out-String)
+        }
 
         # Go through and match Aeries items to Google items to compare Comments->Notes and Assigned users
         foreach ($item in $ItemsHT.GetEnumerator()) {
@@ -90,10 +108,14 @@ Function Sync-CBDataFromAeriesToGoogle {
                         $userEmail = (Get-SPSAeriesStaffEmail -ID $itemAssoc.UserID).EmailAddress
                     }
 
-                    Write-Verbose "Checking annotated user for CB $($cb.SerialNumber)"
+                    if ($DetailedLogging) {
+                        Write-Verbose "Checking annotated user for CB $($cb.SerialNumber)"
+                    }
                     # Let's make sure the right user is annotated in Google
                     if ($userEmail -like $cb.annotatedUser) {
-                        Write-Verbose "Aeries User $($userEmail) matches $($cb.annotatedUser) is already annotated for CB $($cb.SerialNumber)"
+                        if ($DetailedLogging) {
+                            Write-Verbose "Aeries User $($userEmail) matches $($cb.annotatedUser) is already annotated for CB $($cb.SerialNumber)"
+                        }
                         # Users match, do nothing
                     } else {
                         # Users don't match, update var for annotatedUser in Google

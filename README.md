@@ -34,6 +34,22 @@ just reports the current version, so the module still imports straight from a cl
 
 ## Changelog
 
+### 0.4.0
+
+- `Sync-ChromebooksFromGoogleToAeries` and `Sync-CBDataFromAeriesToGoogle` take a new
+  `-DetailedLogging` switch, off by default. The verbose lines that reported each item
+  merely being examined - one per device, every run, whether or not anything changed -
+  are now behind it. A `-Verbose` run reports what changed rather than what was
+  inspected, which keeps `Sync-DistrictAssets.ps1` transcripts readable and clear of the
+  5000-line truncation that prompted the 0.3.0 summary work. Pass `-DetailedLogging` to
+  get the per-device lines back when tracking down a single asset;
+  `-DetailedLogging:$false` is the explicit form of the default.
+- Two of those lines passed a hashtable to `Write-Verbose`'s `[string]` parameter and so
+  printed the literal text `System.Collections.Hashtable`. They now render their
+  contents, and are also behind `-DetailedLogging`.
+- Comment-based help on both functions now documents `config` and `DetailedLogging`.
+- Logging only: what is written to Aeries and Google is unchanged.
+
 ### 0.3.0
 
 - `Sync-ChromebooksFromGoogleToAeries`: model names longer than 60 characters are still

@@ -6,8 +6,20 @@ Function Sync-ChromebooksFromGoogleToAeries {
     The Sync-NewChromebooksFromGoogleToAeries function pulls devices from configured OUs in Google and adds them under the appropriate school in Google Admin Console.
 
     It will create new Titles in Aeries for new models detected in Google, and create new asset items in Aeries for new unique serial numbers found in the Google Admin Console.
+.PARAMETER config
+    Name of the DistrictAssetConfig to load from
+    $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync.
+.PARAMETER DetailedLogging
+    Emit one verbose line per item examined, not just per item changed. Off by
+    default, because a district-wide run with this on produces thousands of lines.
+    Has no effect without -Verbose.
 .EXAMPLE
     Sync-NewChromebooksFromGoogleToAeries
+.EXAMPLE
+    Sync-NewChromebooksFromGoogleToAeries -config District1 -Verbose -DetailedLogging
+
+    Reports every device examined, not just the ones that changed. Use when
+    tracking down a single asset.
 .INPUTS
 .OUTPUTS
 .NOTES
@@ -21,7 +33,11 @@ Function Sync-ChromebooksFromGoogleToAeries {
     name it was shortened to, and how many devices it covered - rather than two
     lines per device. A district-wide sync previously emitted thousands of lines.
 
-    Changed in 0.3.0. See https://github.com/suhsdit/SPSAeriesAssetSync#changelog
+    As of 0.4.0, the lines reporting each item merely being examined sit behind
+    -DetailedLogging and are off by default, so a -Verbose run reports what changed
+    rather than what was inspected. Pass -DetailedLogging to get them back.
+
+    Changed in 0.4.0. See https://github.com/suhsdit/SPSAeriesAssetSync#changelog
 .LINK
     https://github.com/suhsdit/SPSAeriesAssetSync
 #>
@@ -29,7 +45,11 @@ Function Sync-ChromebooksFromGoogleToAeries {
     Param(
         [Parameter( Mandatory,
                     Position=0)]
-            [string]$config
+            [string]$config,
+        # Per-item examination lines are suppressed unless this is passed. They are
+        # one line per device and bury the change events in a district-wide run.
+        [Parameter()]
+            [switch]$DetailedLogging
     )
 
     Begin {
@@ -102,7 +122,7 @@ Function Sync-ChromebooksFromGoogleToAeries {
             if ($AeriesTitles.Title -notcontains $model) {
                 Write-Verbose "Model missing from Aeries District Assets, creating title in Aeries: $($model)"
                 New-SPSAeriesDistrictAssetTitle -Title $model
-            } else {
+            } elseif ($DetailedLogging) {
                 Write-Verbose "Model exists in Aeries District Assets Titles: $($model)"
             }
         }
@@ -113,8 +133,10 @@ Function Sync-ChromebooksFromGoogleToAeries {
         $ItemsHT = @{}
         $AeriesTitles | ForEach-Object {$TitleHT[$_.Title] = $_}
         
-        Write-Verbose "Iterating through items under titles: "
-        Write-Verbose $TitleHT
+        if ($DetailedLogging) {
+            Write-Verbose "Iterating through items under titles: "
+            Write-Verbose ($TitleHT.Values | Format-Table | Out-String)
+        }
 
         # Hashtable for all Chromebook items in Aeries
         foreach ($title in $TitleHT.GetEnumerator()) {
@@ -137,7 +159,9 @@ Function Sync-ChromebooksFromGoogleToAeries {
             
             if ($ItemsHT.ContainsKey($cb.Value.SerialNumber)) {
                 $item = $ItemsHT[$cb.Value.SerialNumber]
-                Write-Verbose "Chromebook already exists as an item in Aeries with SerialNumber: $($cb.Value.SerialNumber)"
+                if ($DetailedLogging) {
+                    Write-Verbose "Chromebook already exists as an item in Aeries with SerialNumber: $($cb.Value.SerialNumber)"
+                }
                 # Check if Google OU matches School Code in Aeries
                 if ($item.School -notlike $cb.Value.AeriesSiteCode -or
                     $item.Room   -notlike $room) {
@@ -165,7 +189,9 @@ Function Sync-ChromebooksFromGoogleToAeries {
                     Room                = $room
                     Comment             = $cb.Value.Notes
                 }
-                Write-verbose $NewItemSplat
+                if ($DetailedLogging) {
+                    Write-Verbose ($NewItemSplat | Out-String)
+                }
                 New-SPSAeriesDistrictAssetItem @NewItemSplat
 
                 # Blank out the annotatedUser fields in Google Admin Console
