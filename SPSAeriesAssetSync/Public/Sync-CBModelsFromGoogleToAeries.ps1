@@ -1,5 +1,5 @@
 Function Sync-CBModelsFromGoogleToAeries {
-<#
+    <#
 .SYNOPSIS
     Import Chromebook Models from Google to Titles in Aeries
 .DESCRIPTION
@@ -14,8 +14,8 @@ Function Sync-CBModelsFromGoogleToAeries {
     [CmdletBinding()] #Enable all the default paramters, including -Verbose
     Param(
         [Parameter( Mandatory,
-                    Position=0)]
-            [string]$config
+            Position = 0)]
+        [string]$config
     )
 
     Begin {
@@ -64,7 +64,7 @@ Function Sync-CBModelsFromGoogleToAeries {
         }
         Write-Verbose "Total Chromebook count: $($cbHT.Count)"
 
-        $Models = $cbHT.GetEnumerator() | ForEach-Object {$_.Value.Model} | Sort-Object | Get-Unique
+        $Models = $cbHT.GetEnumerator() | ForEach-Object { $_.Value.Model } | Sort-Object | Get-Unique
         Write-Verbose "Found unique models: $($Models)"
         $AeriesTitles = Get-SPSAeriesDistrictAssetTitle
 
@@ -72,7 +72,8 @@ Function Sync-CBModelsFromGoogleToAeries {
             if ($AeriesTitles.Title -notcontains $model) {
                 Write-Verbose "Model missing from Aeries District Assets, creating title in Aeries: $($model)"
                 New-SPSAeriesDistrictAssetTitle -Title $model
-            } else {
+            }
+            else {
                 Write-Verbose "Model exists in Aeries District Assets Titles: $($model)"
             }
         }
