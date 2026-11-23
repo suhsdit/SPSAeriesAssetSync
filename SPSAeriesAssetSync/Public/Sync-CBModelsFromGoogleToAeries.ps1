@@ -39,8 +39,9 @@ Function Sync-CBModelsFromGoogleToAeries {
             foreach ($GoogleOU in $schoolconfig.GoogleOUs) {
                 [string]$OUPath = $GoogleOU
                 Write-Host "Retrieving active Chromebooks from $($OUPath)"
-                Get-GSChromeOSDevice -Filter status:ACTIVE -OrgUnitPath $OUPath -Projection FULL |
-                ForEach-Object {
+                $ouDevices = @(Get-GSChromeOSDevice -Filter status:ACTIVE -OrgUnitPath $OUPath -Projection FULL)
+                Write-Host "Chromebooks pulled from $($OUPath): $($ouDevices.Count)"
+                $ouDevices | ForEach-Object {
                     $cbHT[$_.serialnumber] = $_
                     $cbHT[$_.serialnumber] | Add-Member -NotePropertyName 'AeriesSiteCode' -NotePropertyValue $schoolConfig.AeriesSiteCode
                     $cbHT[$_.serialnumber] | Add-Member -NotePropertyName 'Site' -NotePropertyValue $schoolConfig.Site
@@ -59,7 +60,6 @@ Function Sync-CBModelsFromGoogleToAeries {
                     }
 
                 }
-                Write-Host "Chromebooks Pulled from $($OUPath): $($cbHT.Count)"
             }
         }
         Write-Host "Total Chromebook count: $($cbHT.Count)"
