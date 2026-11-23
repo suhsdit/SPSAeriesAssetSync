@@ -24,7 +24,7 @@ Function Sync-CBModelsFromGoogleToAeries {
         Write-Verbose "Parameters are $($PSBoundParameters | Select-Object -Property *)"
 
         #include $DistrictAssetConfig
-        Write-Verbose "Using Config: $config"
+        Write-Host "Using Config: $config"
         . $env:LOCALAPPDATA\powershell\SPSAeriesAssetSync\$config\DistrictAssetConfig.ps1
         Set-PSGSuiteConfig $DistrictAssetConfig.PSGSuiteConfig
         Set-SPSAeriesConfiguration -Name $DistrictAssetConfig.SPSAeriesConfig
@@ -38,7 +38,7 @@ Function Sync-CBModelsFromGoogleToAeries {
         foreach ($schoolConfig in $SchoolConfigs) {
             foreach ($GoogleOU in $schoolconfig.GoogleOUs) {
                 [string]$OUPath = $GoogleOU
-                Write-Verbose "Retrieving active Chromebooks from $($OUPath)"
+                Write-Host "Retrieving active Chromebooks from $($OUPath)"
                 Get-GSChromeOSDevice -Filter status:ACTIVE -OrgUnitPath $OUPath -Projection FULL |
                 ForEach-Object {
                     $cbHT[$_.serialnumber] = $_
@@ -59,13 +59,13 @@ Function Sync-CBModelsFromGoogleToAeries {
                     }
 
                 }
-                Write-Verbose "Chromebooks Pulled from $($OUPath): $($cbHT.Count)"
+                Write-Host "Chromebooks Pulled from $($OUPath): $($cbHT.Count)"
             }
         }
-        Write-Verbose "Total Chromebook count: $($cbHT.Count)"
+        Write-Host "Total Chromebook count: $($cbHT.Count)"
 
         $Models = $cbHT.GetEnumerator() | ForEach-Object { $_.Value.Model } | Sort-Object | Get-Unique
-        Write-Verbose "Found unique models: $($Models)"
+        Write-Host "Found unique models: $($Models)"
         $AeriesTitles = Get-SPSAeriesDistrictAssetTitle
 
         ForEach ($model in $Models) {
