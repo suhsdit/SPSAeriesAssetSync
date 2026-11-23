@@ -58,7 +58,6 @@ Function Sync-CBModelsFromGoogleToAeries {
                         $cbHT[$_.serialnumber].Model = $model
                         Write-Verbose "Model name truncated to: $model"
                     }
-
                 }
             }
         }
